@@ -1,0 +1,48 @@
+name: conc-test
+run-name: "conc-test PR #${{ github.event.pull_request.number }} label ${{ github.event.label.name }}"
+
+# Job-level concurrency vs job-level if:. Only the run-gate label passes the filters.
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  plain:
+    # Normal job: if: and concurrency on the same job.
+    if: github.event.label.name == 'run-gate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: plain-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "start $(date -u +%FT%TZ)"; sleep 180; echo "end $(date -u +%FT%TZ)"
+
+  outer_conc:
+    # Calling job: if: and concurrency on the calling job.
+    if: github.event.label.name == 'run-gate'
+    concurrency:
+      group: outer-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    uses: ./.github/workflows/conc-inner.yml
+    with:
+      run_inner: true
+      group_prefix: outer-inner
+
+  inner_filter:
+    # Calling job always runs. The inner job has both if: and concurrency.
+    uses: ./.github/workflows/conc-inner.yml
+    with:
+      run_inner: ${{ github.event.label.name == 'run-gate' }}
+      group_prefix: innerfilter
+
+  outer_filter_inner_conc:
+    # Calling job has the if:. The inner job has the concurrency group.
+    if: github.event.label.name == 'run-gate'
+    uses: ./.github/workflows/conc-inner.yml
+    with:
+      run_inner: true
+      group_prefix: innerconc

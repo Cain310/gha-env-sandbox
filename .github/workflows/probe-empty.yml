@@ -1,0 +1,13 @@
+name: probe-empty
+
+# Passes a required secret whose value is empty (the name is not defined anywhere).
+
+on: workflow_dispatch
+
+permissions: {}
+
+jobs:
+  call:
+    uses: Cain310/gha-env-sandbox-engine/.github/workflows/probe.yml@b71dd71f40f3643c3f983ae89b2f55767daa246d
+    secrets:
+      PROBE_KEY: ${{ secrets.NOT_DEFINED_ANYWHERE }}

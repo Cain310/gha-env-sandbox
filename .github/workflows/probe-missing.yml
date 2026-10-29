@@ -1,0 +1,11 @@
+name: probe-missing
+
+# Omits a required secret entirely.
+
+on: workflow_dispatch
+
+permissions: {}
+
+jobs:
+  call:
+    uses: Cain310/gha-env-sandbox-engine/.github/workflows/probe.yml@b71dd71f40f3643c3f983ae89b2f55767daa246d

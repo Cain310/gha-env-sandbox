@@ -1,0 +1,24 @@
+name: conc-inner
+
+on:
+  workflow_call:
+    inputs:
+      run_inner:
+        type: boolean
+        required: true
+      group_prefix:
+        type: string
+        required: true
+
+permissions: {}
+
+jobs:
+  inner:
+    if: inputs.run_inner
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: ${{ inputs.group_prefix }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "start $(date -u +%FT%TZ)"; sleep 180; echo "end $(date -u +%FT%TZ)"

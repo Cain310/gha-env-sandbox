@@ -1,0 +1,30 @@
+name: dispatch-nodeploy
+run-name: "nodeploy review PR #${{ github.event.pull_request.number || inputs.pr_number }}"
+
+# Same as dispatch.yml, but calls the engine workflow whose environment jobs set deployment: false.
+
+on:
+  pull_request_target:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  review:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'nodeploy'
+    permissions:
+      contents: read
+      checks: write
+    uses: Cain310/gha-env-sandbox-engine/.github/workflows/review-nodeploy.yml@b71dd71f40f3643c3f983ae89b2f55767daa246d
+    with:
+      pr_number: ${{ format('{0}', github.event.pull_request.number || inputs.pr_number) }}
+    secrets:
+      ANALYSIS_KEY: ${{ secrets.ANALYSIS_KEY }}
+      PUBLISH_KEY: ${{ secrets.PUBLISH_KEY }}
+      PASSED_ANALYSIS_KEY: ${{ secrets.ANALYSIS_KEY }}

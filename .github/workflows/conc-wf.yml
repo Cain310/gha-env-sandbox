@@ -1,0 +1,22 @@
+name: conc-wf
+run-name: "conc-wf PR #${{ github.event.pull_request.number }} label ${{ github.event.label.name }}"
+
+# Workflow-level concurrency vs job-level if:, for contrast with conc-test.yml.
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions: {}
+
+concurrency:
+  group: wf-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  wf_job:
+    if: github.event.label.name == 'run-gate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: echo "start $(date -u +%FT%TZ)"; sleep 180; echo "end $(date -u +%FT%TZ)"
