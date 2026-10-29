@@ -1,5 +1,5 @@
 name: dispatch
-run-name: "review PR #${{ github.event.pull_request.number || inputs.pr_number }}"
+run-name: "SIDE-BASE copy review PR #${{ github.event.pull_request.number || inputs.pr_number }}"
 
 # Small dispatcher. Calls the engine's reusable workflow pinned by full commit SHA.
 
