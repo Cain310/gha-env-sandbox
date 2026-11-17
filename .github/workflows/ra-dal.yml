@@ -26,6 +26,8 @@ jobs:
       || (fromJSON(vars.RA_LENSES || '{}').dal.enabled == 'manual'
           && github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/ra-reusable.yml
+    permissions:
+      actions: read
     with:
       lens: dal
       label: DAL

@@ -76,14 +76,22 @@ jobs:
     environment:
       name: ra-publish
       deployment: false
+    permissions:
+      actions: read
     steps:
       - name: Read the switch again and decide
         env:
           ANALYSIS_SECRET: ${{ secrets.RA_DUMMY_ANALYSIS }}
           PUBLISH_SECRET: ${{ secrets.RA_DUMMY_PUBLISH }}
           SWITCH: ${{ vars.RA_LENSES }}
+          ENV_SWITCH: ${{ vars.RA_ENV_SWITCH }}
+          GH_TOKEN: ${{ github.token }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          echo "PUBLISH_ENV_SWITCH=$ENV_SWITCH"
+          code=$(curl -s -o "$RUNNER_TEMP/v.json" -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/variables/RA_LENSES")
+          echo "REST_STATUS=$code"
+          echo "REST_VALUE=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("value"))' "$RUNNER_TEMP/v.json")"
           echo "ANALYSIS_SECRET_IN_PUBLISH=${ANALYSIS_SECRET:+present}"
           echo "PUBLISH_SECRET_IN_PUBLISH=${PUBLISH_SECRET:+present}"
           echo "PUBLISH_SWITCH=$SWITCH"
