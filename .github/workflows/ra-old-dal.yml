@@ -1,0 +1,35 @@
+name: RA old DAL review
+
+run-name: "RA old DAL review key ${{ inputs.key }}"
+
+# Sandbox proof: the old dispatcher, switched by two variables, RA_OLD_ENABLED and RA_OLD_DRY_RUN.
+# It shares the dal family's concurrency group with ra-dal.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      hold:
+        description: Seconds the analysis job holds.
+        type: number
+        default: 0
+      key:
+        description: Stands in for the PR number in names and groups.
+        type: string
+        default: "1"
+
+permissions: {}
+
+jobs:
+  review:
+    name: review
+    if: vars.RA_OLD_ENABLED == 'true' || vars.RA_OLD_ENABLED == 'manual'
+    uses: ./.github/workflows/ra-reusable.yml
+    with:
+      lens: dal
+      label: DAL
+      dry_run: ${{ vars.RA_OLD_DRY_RUN != 'false' }}
+      hold: ${{ inputs.hold }}
+      key: ${{ inputs.key }}
+    secrets:
+      RA_DUMMY_ANALYSIS: ${{ secrets.RA_DUMMY_ANALYSIS }}
+      RA_DUMMY_PUBLISH: ${{ secrets.RA_DUMMY_PUBLISH }}
