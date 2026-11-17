@@ -24,6 +24,8 @@ jobs:
     name: review
     if: vars.RA_OLD_ENABLED == 'true' || vars.RA_OLD_ENABLED == 'manual'
     uses: ./.github/workflows/ra-reusable.yml
+    permissions:
+      actions: read
     with:
       lens: dal
       label: DAL
