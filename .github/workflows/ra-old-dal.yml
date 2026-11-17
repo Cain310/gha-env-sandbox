@@ -28,7 +28,8 @@ jobs:
       lens: dal
       label: DAL
       dry_run: ${{ vars.RA_OLD_DRY_RUN != 'false' }}
-      hold: ${{ inputs.hold }}
+      # A workflow_dispatch number input arrives as a string, and the called workflow wants a number.
+      hold: ${{ fromJSON(inputs.hold) }}
       key: ${{ inputs.key }}
     secrets:
       RA_DUMMY_ANALYSIS: ${{ secrets.RA_DUMMY_ANALYSIS }}
